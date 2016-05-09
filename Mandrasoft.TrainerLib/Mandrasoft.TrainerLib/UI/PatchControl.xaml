@@ -1,0 +1,25 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mandrasoft.TrainerLib.UI"
+             xmlns:Models="clr-namespace:Mandrasoft.TrainerLib.UI.Models"
+    xmlns:Converters="clr-namespace:Mandrasoft.TrainerLib.UI.Converters"
+    x:Class="Mandrasoft.TrainerLib.UI.PatchControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="50.001" d:DesignWidth="480.488">
+    <UserControl.Resources>
+        <Converters:BooleanToVisibleConverter x:Key="boolToVisible" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="156*"/>
+            <ColumnDefinition Width="271*"/>
+            <ColumnDefinition Width="53*"/>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="label" Content="{Binding Title, Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" ToolTip="{Binding Description, Mode=OneWay}" />
+        <Label x:Name="label1" Content="{Binding Key}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBox" Content="" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" RenderTransformOrigin="1.87,0.46" Width="19" Visibility="{Binding Toggleable, Converter= {StaticResource boolToVisible}}" IsChecked="{Binding Enabled, Mode=TwoWay}"/>
+    </Grid>
+</UserControl>
