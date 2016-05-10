@@ -15,6 +15,9 @@ namespace Mandrasoft.TrainerLib
         string ExecutableName { get; }
         BitmapImage HeaderImage { get; }
         Dictionary<Keys, Patch> Patches { get; }
-
+    }
+    public interface IInjectedTrainer : ITrainer
+    {
+       
     }
 }

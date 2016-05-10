@@ -25,7 +25,11 @@ namespace Mandrasoft.TrainerLib.UI.Models
             Trainer = trainer;
             TitleWindow = trainer.GameName;
             Patches = new List<PatchModel>();
-            HeaderImage = trainer.HeaderImage;
+            try
+            {
+                HeaderImage = trainer.HeaderImage;
+            }
+            catch { }
             foreach (var p in trainer.Patches)
             {
                 Patches.Add(new PatchModel(p.Key,p.Value));

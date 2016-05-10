@@ -28,7 +28,8 @@ namespace Mandrasoft.TrainerLib
             var token = tokenSource.Token;
             Task t = Task.Run(()=>ProcessChecker(token),token);
             window.DataContext = _Trainer;
-            _hookID = SetHook(KeyboardHookCallback);
+            if(!(_Trainer.Trainer is IInjectedTrainer))
+                _hookID = SetHook(KeyboardHookCallback);
             app.Run(window);
             tokenSource.Cancel();
             try
@@ -42,7 +43,8 @@ namespace Mandrasoft.TrainerLib
             {
                 tokenSource.Dispose();
             }
-            UnhookWindowsHookEx(_hookID);
+            if(_hookID!= IntPtr.Zero)
+                UnhookWindowsHookEx(_hookID);
         }
         private static void ProcessChecker(CancellationToken token)
         {
@@ -51,8 +53,15 @@ namespace Mandrasoft.TrainerLib
                 var process = Process.GetProcessesByName(_Trainer.Trainer.ExecutableName);
                 if (process.Count() == 1)
                 {
-                    _Trainer.GameFound = true;
-                    _Trainer.Writer = new GameWriter(process.First());
+                    if (_Trainer.GameFound == false)
+                    {
+                        _Trainer.GameFound = true;
+                        _Trainer.Writer = new GameWriter(process.First());
+                        if (_Trainer.Trainer is IInjectedTrainer)
+                        {
+                            //Inject Code
+                        }
+                    }
                 }
                 else
                 {
