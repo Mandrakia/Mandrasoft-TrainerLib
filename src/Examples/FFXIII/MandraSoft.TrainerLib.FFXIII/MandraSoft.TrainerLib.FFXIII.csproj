@@ -100,7 +100,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Mandrasoft.TrainerLib\Mandrasoft.TrainerLib\Mandrasoft.TrainerLib.csproj">
+    <ProjectReference Include="..\..\..\Mandrasoft.TrainerLib\Mandrasoft.TrainerLib.csproj">
       <Project>{c025a317-4c0d-492c-900c-2eff54313812}</Project>
       <Name>Mandrasoft.TrainerLib</Name>
     </ProjectReference>
