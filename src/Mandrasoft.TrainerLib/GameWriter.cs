@@ -75,7 +75,8 @@ namespace Mandrasoft.TrainerLib
         }
         public IntPtr ReadIntPtr(IntPtr offset)
         {
-            throw new NotImplementedException();
+            var bytes = Read(offset, 4);
+            return (IntPtr)BitConverter.ToInt32(bytes, 0);
         }
         public MaskMatchResult SearchMask(MaskItem[] mask)
         {

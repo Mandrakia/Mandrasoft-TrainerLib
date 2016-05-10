@@ -100,13 +100,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\header.jpg" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Mandrasoft.TrainerLib\Mandrasoft.TrainerLib.csproj">
       <Project>{c025a317-4c0d-492c-900c-2eff54313812}</Project>
       <Name>Mandrasoft.TrainerLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\header.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
