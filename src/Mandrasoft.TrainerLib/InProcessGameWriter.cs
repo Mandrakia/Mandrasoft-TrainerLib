@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EasyHook;
 using static Mandrasoft.TrainerLib.ImportsWin32;
 
 namespace Mandrasoft.TrainerLib
 {
-    unsafe class InProcessGameWriter : IGameWriter
+    unsafe class InProcessGameWriter : IInjectedGameWriter
     {
         public byte[] Read(IntPtr offset, int length)
         {
@@ -137,6 +138,13 @@ namespace Mandrasoft.TrainerLib
                 b++;
             }
             return bytes.Length;
+        }
+
+        public LocalHook HookFunction(IntPtr fctAdress, Delegate deleg)
+        {
+            var res =  LocalHook.Create(fctAdress, deleg, null);
+            res.ThreadACL.SetExclusiveACL(null);
+            return res;
         }
     }
 }

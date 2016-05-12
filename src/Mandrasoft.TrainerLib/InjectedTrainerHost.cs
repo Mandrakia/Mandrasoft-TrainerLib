@@ -16,8 +16,10 @@ using static Mandrasoft.TrainerLib.ImportsWin32;
 
 namespace Mandrasoft.TrainerLib
 {
-    public sealed class InjectedTrainerHost
+    public unsafe sealed class InjectedTrainerHost
     {
+        static private IntPtr stateAddr;
+        static private TrainerStateStructure* _state;
         static private bool ModuleUnload = false;
         static private TrainerModel _Trainer;
         static private IntPtr _hookID;
@@ -58,6 +60,23 @@ namespace Mandrasoft.TrainerLib
                         _Trainer.Writer = new GameWriter(process.First());
                         LoadModule();
                     }
+                    //Sync patches States.
+                    else
+                    {
+                        if (stateAddr != IntPtr.Zero)
+                        {
+                            var b = _Trainer.Writer.Read(stateAddr, Marshal.SizeOf<TrainerStateStructure>());                            
+                            for (var i = 0; i < _Trainer.Patches.Count; i++)
+                            {
+                                if (_Trainer.Patches[i].Patch is TogglePatch)
+                                {
+                                    if (b[i + 1] == 0x1)
+                                        _Trainer.Patches[i].Enabled = true;
+                                    else _Trainer.Patches[i].Enabled = false;
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -70,6 +89,10 @@ namespace Mandrasoft.TrainerLib
         private static void UnloadModule()
         {
             ModuleUnload = true;
+            if (_Trainer.GameFound)
+            {
+                _Trainer.Writer.Write(stateAddr, new byte[] { 0x01 });
+            }
         }
         private static void LoadModule()
         {
@@ -92,11 +115,14 @@ namespace Mandrasoft.TrainerLib
             CreateRemoteThread(pHandle, IntPtr.Zero, 0, gameKernelModule.BaseAddress + offset, baseAdress, 0, out lThreadId);
             WaitForSingleObject((IntPtr)lThreadId, 0xFFFFFFFF);
             process.Refresh();
+            //ReserveSpace for StateStructure  
+            stateAddr = VirtualAllocEx(pHandle, IntPtr.Zero, (IntPtr)Marshal.SizeOf<TrainerStateStructure>(), AllocationType.Commit | AllocationType.Reserve, AllocationProtect.PAGE_EXECUTE_READWRITE);
+        
             //Module loaded.
             //Now actually call the bootloader.
             string args = string.Empty;
             args +=_Trainer.Trainer.GetType().Assembly.Location + "|";
-            args += _Trainer.Trainer.GetType().FullName + "|EntryPoint|test";
+            args += _Trainer.Trainer.GetType().FullName + "|EntryPoint|" + stateAddr.ToInt32().ToString();
             var lArgsPtr = System.Runtime.InteropServices.Marshal.StringToHGlobalUni(args);
             var bytesStr = new byte[args.Length * 2 + 1];
             Marshal.Copy(lArgsPtr, bytesStr, 0, args.Length * 2 + 1);
@@ -112,8 +138,9 @@ namespace Mandrasoft.TrainerLib
             CreateRemoteThread(pHandle, IntPtr.Zero, 0, functionAddr, strAddress, 0, out lThreadId);
             WaitForSingleObject((IntPtr)lThreadId, 0xFFFFFFFF);
         }
-        public static void SetHooks<T>() where T : IInjectedTrainer
+        public static void SetHooks<T>(string stateAddre) where T : IInjectedTrainer
         {
+            _state = (TrainerStateStructure*)int.Parse(stateAddre);
             Thread th = new Thread(InputHandler<T>);
             th.SetApartmentState(ApartmentState.STA);
             th.Start();
@@ -123,22 +150,34 @@ namespace Mandrasoft.TrainerLib
             var trainer = Activator.CreateInstance<T>();
             _Trainer = new TrainerModel(trainer);
             _Trainer.Writer = new InProcessGameWriter();
-            while (!ModuleUnload)
+            while (!_state->ShouldStop)
             {
                 foreach (var p in _Trainer.Patches)
                 {
                     var st = Keyboard.GetKeyStates(KeyInterop.KeyFromVirtualKey((int)p.Key));
                     if (st == KeyStates.Down)
                     {
-                        if (p.Toggleable && p.Enabled)
+                        if (p.Toggleable && _state->PatchesState[_Trainer.Patches.IndexOf(p)])
                         {
-                            if (((TogglePatch)p.Patch).DisablePatch(_Trainer.Writer)) p.Enabled = false;
+                            if (((TogglePatch)p.Patch).DisablePatch(_Trainer.Writer)) _state->PatchesState[_Trainer.Patches.IndexOf(p)] = false;
                         }
                         else
+                        {
                             p.Patch.ApplyPatch(_Trainer.Writer);
+                            if(p.Toggleable)
+                                _state->PatchesState[_Trainer.Patches.IndexOf(p)] = true;
+                        }
                     }
                 }
-                Thread.Sleep(60);
+                Thread.Sleep(17);
+            }
+            //disable all patches
+            for (var i = 0; i < _Trainer.Patches.Count; i++)
+            {
+                if (_Trainer.Patches[i].Toggleable && _state->PatchesState[i])
+                {
+                    ((TogglePatch)_Trainer.Patches[i].Patch).DisablePatch(_Trainer.Writer);
+                }
             }
         }
     }

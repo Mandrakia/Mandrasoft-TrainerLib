@@ -1,6 +1,8 @@
-﻿using Mandrasoft.TrainerLib;
+﻿using EasyHook;
+using Mandrasoft.TrainerLib;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -8,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace MandraSoft.TrainerLib.InjectedFFXIII
 {
-    class AddGilPatch : Patch
+    unsafe class AddGilPatch : Patch
     {
         public override string Description => "Add 50.000 gils";
 
         public override string Title => "Add 50.000 gils";
 
         private IntPtr moneyPtr = IntPtr.Zero;
+
 
         public override bool ApplyPatch(IGameWriter writer)
         {
@@ -25,13 +28,15 @@ namespace MandraSoft.TrainerLib.InjectedFFXIII
                 {
                     moneyPtr = res.Matches.First().Start;
 
-                }
+                }               
             }
             AddMoney addMoneyMethod = (AddMoney)Marshal.GetDelegateForFunctionPointer(moneyPtr, typeof(AddMoney));
             addMoneyMethod(50000);
             return true;
         }
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate int AddMoney(int amount);
+     
     }
 }

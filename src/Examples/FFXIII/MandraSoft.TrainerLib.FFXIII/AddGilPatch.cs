@@ -31,7 +31,6 @@ namespace MandraSoft.TrainerLib.FFXIII
             var currMoney = writer.ReadIntPtr(moneyPtr);
             currMoney += 50000;
             return writer.Write(moneyPtr, BitConverter.GetBytes(currMoney.ToInt32())) == 4;
-
         }
     }
 }

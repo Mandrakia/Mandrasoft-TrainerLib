@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasyHook;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,4 +29,9 @@ namespace Mandrasoft.TrainerLib
         bool ApplyPatch(MaskItem[] mask, byte[] bytes, bool greedy);
         bool ApplyPatch(MaskItem[] mask, byte[] bytes, MaskMatch mt);
     }
+    public interface IInjectedGameWriter : IGameWriter
+    {
+        LocalHook HookFunction(IntPtr fctAdress,Delegate deleg);
+    }
+
 }

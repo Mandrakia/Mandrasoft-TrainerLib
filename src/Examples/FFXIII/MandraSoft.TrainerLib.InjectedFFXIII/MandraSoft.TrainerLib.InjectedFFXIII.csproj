@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +34,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyHook">
+      <HintPath>..\..\..\packages\EasyHook.2.7.5870.9\lib\net40\EasyHook.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,7 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddGilPatch.cs" />
+    <Compile Include="CharacterCombatStat.cs" />
     <Compile Include="InjectedFFXIIITrainer.cs" />
+    <Compile Include="OneHpMonsterPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

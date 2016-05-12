@@ -28,7 +28,7 @@ namespace MandraSoft.TrainerLib.InjectedFFXIII
             }
         }
 
-        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.NumPad1, new AddGilPatch() } };
+        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.NumPad1, new AddGilPatch() }, { Keys.NumPad0, new OneHpMonsterPatch() } };
 
         [STAThread]
         public static void Main(string[] args)
@@ -37,7 +37,7 @@ namespace MandraSoft.TrainerLib.InjectedFFXIII
         }
         public static int EntryPoint(string args)
         {
-            InjectedTrainerHost.SetHooks<InjectedFFXIIITrainer>();
+            InjectedTrainerHost.SetHooks<InjectedFFXIIITrainer>(args);
             return 1;
             //throw new NotImplementedException();
         }

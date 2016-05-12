@@ -26,7 +26,7 @@ namespace MandraSoft.TrainerLib.FFXIII
                 return img;
             } }
 
-        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.NumPad0, new NoCostCrystallium() }, { Keys.NumPad1, new AddGilPatch() } };
+        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.NumPad0, new NoCostCrystallium() }, { Keys.NumPad1, new AddGilPatch() }, { Keys.NumPad2, new RandomPatch() }  };
 
         [STAThread]
         public static void Main(string[] args)
