@@ -12,11 +12,14 @@ namespace Mandrasoft.TrainerLib
 {
     public class GameWriter : IGameWriter
     {
+        public IntPtr MainModulePtr => pMainModule.BaseAddress;
+        public Process Process { get; set; }
         private IntPtr pHandle;
         private ProcessModule pMainModule;
         public GameWriter(Process process)
         {
             pMainModule = process.MainModule;
+            Process = process;
             pHandle = ImportsWin32.OpenProcess(ImportsWin32.ProcessAccessFlags.QueryInformation | ImportsWin32.ProcessAccessFlags.VirtualMemoryOperation | ImportsWin32.ProcessAccessFlags.VirtualMemoryRead | ImportsWin32.ProcessAccessFlags.VirtualMemoryWrite, false, process.Id);
         }
         public bool ApplyPatch(MaskItem[] mask, byte[] bytes)

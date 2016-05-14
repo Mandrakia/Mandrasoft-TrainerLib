@@ -1,6 +1,7 @@
 ﻿using EasyHook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,8 @@ namespace Mandrasoft.TrainerLib
 
     public interface IGameWriter
     {
+        Process Process { get; }
+        IntPtr MainModulePtr { get; }
         int Write(IntPtr offset, byte[] bytes);
         byte[] Read(IntPtr offset, int length);
         IntPtr ReadIntPtr(IntPtr offset);

@@ -11,6 +11,8 @@ namespace Mandrasoft.TrainerLib
 {
     unsafe class InProcessGameWriter : IInjectedGameWriter
     {
+        public Process Process => Process.GetCurrentProcess();
+        public IntPtr MainModulePtr => Process.GetCurrentProcess().MainModule.BaseAddress;
         public byte[] Read(IntPtr offset, int length)
         {
             byte* b = (byte*)offset;
@@ -65,52 +67,28 @@ namespace Mandrasoft.TrainerLib
         }
         public MaskMatchResult SearchMask(MaskItem[] mask, IntPtr start, int length)
         {
-            var maxBLength = 1024 * 1024 * 5;
-            var result = new MaskMatchResult();
-            var bytesRead = 0;
-            byte[] leftOvers = null;
-            var mLength = mask.Length;
-            while (bytesRead < length)
+            MaskMatchResult res = new MaskMatchResult();
+            for (var i = 0; i < length - mask.Length; i++)
             {
-                var bytesToRead = (length - bytesRead) < maxBLength ? length - bytesRead : maxBLength;
-                var buffer = Read(start + bytesRead, bytesToRead);
-                IntPtr bufferStartOffset = start + bytesRead;
-                if (leftOvers != null)
+                if (IsMatch(mask, start + i))
                 {
-                    var tBuffer = new byte[leftOvers.Length + buffer.Length];
-                    Array.Copy(leftOvers, tBuffer, leftOvers.Length);
-                    Array.Copy(buffer, 0, tBuffer, leftOvers.Length, buffer.Length);
-                    buffer = tBuffer;
-                    bufferStartOffset -= leftOvers.Length;
+                    res.Success = true;
+                    res.Matches.Add(Match(mask, start + i));
                 }
-                bytesRead += bytesToRead;
-                var mStart = 0;
-                while (mStart <= buffer.Length - mLength)
-                {
-                    if (IsMatch(mask, buffer, mStart, bufferStartOffset + mStart))
-                    {
-                        result.Success = true;
-                        result.Matches.Add(Match(mask, buffer, mStart, bufferStartOffset + mStart));
-                    }
-                    mStart++;
-                }
-                leftOvers = new byte[buffer.Length - mStart];
-                Array.Copy(buffer, mStart, leftOvers, 0, leftOvers.Length);
             }
-            return result;
+            return res;
         }
-        public bool IsMatch(MaskItem[] mask, byte[] bytes, int offset, IntPtr start)
+        public bool IsMatch(MaskItem[] mask, IntPtr start)
         {
-            if (bytes.Length - offset - mask.Length < 0) throw new Exception("Mask/Bytes length mismatch");
             for (var i = 0; i < mask.Length; i++)
             {
-                if (mask[i].Type == MaskItem.MaskType.Byte && mask[i].Byte != bytes[offset + i]) return false;
+                if (mask[i].Type == MaskItem.MaskType.Byte && mask[i].Byte != *(byte*)(start + i)) return false;
             }
             return true;
         }
-        public MaskMatch Match(MaskItem[] mask, byte[] bytes, int offset, IntPtr start)
+        public MaskMatch Match(MaskItem[] mask, IntPtr start)
         {
-            if (bytes.Length - offset - mask.Length < 0) throw new Exception("Mask/Bytes length mismatch");
+
             MaskMatch m = new MaskMatch() { Start = start };
             for (var i = 0; i < mask.Length; i++)
             {
@@ -118,10 +96,10 @@ namespace Mandrasoft.TrainerLib
                 switch (mask[i].Type)
                 {
                     case MaskItem.MaskType.Byte:
-                        if (mask[i].Byte != bytes[offset + i]) m = null;
+                        if (mask[i].Byte != *(byte*)(start+i)) m = null;
                         break;
                     case MaskItem.MaskType.Capture:
-                        m.Captures.Add(bytes[offset + i]);
+                        m.Captures.Add(*(byte*)(start + i));
                         break;
                         //Ignore wildcard nothing to do there.
                 }

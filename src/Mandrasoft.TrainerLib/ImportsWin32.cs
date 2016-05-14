@@ -111,6 +111,29 @@ namespace Mandrasoft.TrainerLib
         public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, out uint lpThreadId);
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern UInt32 WaitForSingleObject(IntPtr hHandle, UInt32 dwMilliseconds);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+
+        [DllImport("WinMM.dll")]
+        public static extern bool PlaySound(string data, int Mod, int flag);     // these are the SoundFlags we are using here, check mmsystem.h for more    
+        public const int SND_ASYNC = 0x0001;     // play asynchronously    
+        public const int SND_FILENAME = 0x00020000; // use file name    
+        public const int SND_PURGE = 0x0040;     // purge non-static events     
+        public const int SND_NODEFAULT = 0x00002;
+        public const int SND_SYNC = 0x00000;
+        public const int SND_MEMORY = 0x00004;
+        public static bool Play(string data, int SoundFlags = (SND_ASYNC | SND_MEMORY | SND_NODEFAULT | SND_SYNC))
+        {
+            return PlaySound(data, 0, SoundFlags);
+        }
+        public static void StopPlay()
+        {
+            PlaySound(null, 0, SND_PURGE);
+        }
         internal delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
     }
 }

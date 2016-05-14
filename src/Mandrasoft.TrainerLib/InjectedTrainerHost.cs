@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 using System.Threading;
@@ -18,6 +20,7 @@ namespace Mandrasoft.TrainerLib
 {
     public unsafe sealed class InjectedTrainerHost
     {
+
         static private IntPtr stateAddr;
         static private TrainerStateStructure* _state;
         static private bool ModuleUnload = false;
@@ -30,6 +33,7 @@ namespace Mandrasoft.TrainerLib
             _Trainer = new TrainerModel((T)Activator.CreateInstance(typeof(T)));
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
+            _hookID = SetHook(KeyboardHookCallback);
             Task t = Task.Run(() => ProcessChecker(token), token);
             window.DataContext = _Trainer;
             app.Run(window);
@@ -45,6 +49,8 @@ namespace Mandrasoft.TrainerLib
             {
                 tokenSource.Dispose();
             }
+            if (_hookID != IntPtr.Zero)
+                UnhookWindowsHookEx(_hookID);
             UnloadModule();
         }
         private static void ProcessChecker(CancellationToken token)
@@ -63,19 +69,19 @@ namespace Mandrasoft.TrainerLib
                     //Sync patches States.
                     else
                     {
-                        if (stateAddr != IntPtr.Zero)
-                        {
-                            var b = _Trainer.Writer.Read(stateAddr, Marshal.SizeOf<TrainerStateStructure>());                            
-                            for (var i = 0; i < _Trainer.Patches.Count; i++)
-                            {
-                                if (_Trainer.Patches[i].Patch is TogglePatch)
-                                {
-                                    if (b[i + 1] == 0x1)
-                                        _Trainer.Patches[i].Enabled = true;
-                                    else _Trainer.Patches[i].Enabled = false;
-                                }
-                            }
-                        }
+                        //if (stateAddr != IntPtr.Zero)
+                        //{
+                        //    var b = _Trainer.Writer.Read(stateAddr, Marshal.SizeOf<TrainerStateStructure>());                            
+                        //    for (var i = 0; i < _Trainer.Patches.Count; i++)
+                        //    {
+                        //        if (_Trainer.Patches[i].Patch is TogglePatch)
+                        //        {
+                        //            if (b[i + 1] == 0x1)
+                        //                _Trainer.Patches[i].Enabled = true;
+                        //            else _Trainer.Patches[i].Enabled = false;
+                        //        }
+                        //    }
+                        //}
                     }
                 }
                 else
@@ -83,7 +89,7 @@ namespace Mandrasoft.TrainerLib
                     _Trainer.GameFound = false;
                     _Trainer.Writer = null;
                 }
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(20);
             }
         }
         private static void UnloadModule()
@@ -134,13 +140,13 @@ namespace Mandrasoft.TrainerLib
                 System.Threading.Thread.Sleep(60);
             }
             IntPtr functionAddr = process.Modules.OfType<ProcessModule>().Where(x => x.FileName.ToLower().Contains("bootloader")).Single().BaseAddress;
-            functionAddr += 0x19200;
+            functionAddr += 0x19230;
             CreateRemoteThread(pHandle, IntPtr.Zero, 0, functionAddr, strAddress, 0, out lThreadId);
             WaitForSingleObject((IntPtr)lThreadId, 0xFFFFFFFF);
         }
         public static void SetHooks<T>(string stateAddre) where T : IInjectedTrainer
         {
-            _state = (TrainerStateStructure*)int.Parse(stateAddre);
+            _state = (TrainerStateStructure*)((IntPtr)int.Parse(stateAddre)).ToPointer();
             Thread th = new Thread(InputHandler<T>);
             th.SetApartmentState(ApartmentState.STA);
             th.Start();
@@ -150,26 +156,48 @@ namespace Mandrasoft.TrainerLib
             var trainer = Activator.CreateInstance<T>();
             _Trainer = new TrainerModel(trainer);
             _Trainer.Writer = new InProcessGameWriter();
+            foreach (var p in _Trainer.Patches)
+            {
+                p.Patch.Init(_Trainer.Writer);
+            }
             while (!_state->ShouldStop)
             {
-                foreach (var p in _Trainer.Patches)
+                try
                 {
-                    var st = Keyboard.GetKeyStates(KeyInterop.KeyFromVirtualKey((int)p.Key));
-                    if (st == KeyStates.Down)
+                    for (var i = 0; i < _Trainer.Patches.Count; i++)
                     {
-                        if (p.Toggleable && _state->PatchesState[_Trainer.Patches.IndexOf(p)])
+                        if (_state->PatchesState[i])
                         {
-                            if (((TogglePatch)p.Patch).DisablePatch(_Trainer.Writer)) _state->PatchesState[_Trainer.Patches.IndexOf(p)] = false;
+                            if (_Trainer.Patches[i].Patch is TogglePatch)
+                            {
+                                if (!_Trainer.Patches[i].Enabled)
+                                {
+                                    _Trainer.Patches[i].Patch.ApplyPatch(_Trainer.Writer);
+                                    //System.Media.SystemSounds.Question.Play();
+                                    _Trainer.Patches[i].Enabled = true;
+                                }
+                            }
+                            else
+                            {
+                                _Trainer.Patches[i].Patch.ApplyPatch(_Trainer.Writer);
+                                //System.Media.SystemSounds.Question.Play();
+                                _state->PatchesState[i] = false;
+                            }
                         }
                         else
                         {
-                            p.Patch.ApplyPatch(_Trainer.Writer);
-                            if(p.Toggleable)
-                                _state->PatchesState[_Trainer.Patches.IndexOf(p)] = true;
+                            if (_Trainer.Patches[i].Patch is TogglePatch && _Trainer.Patches[i].Enabled)
+                            {
+                                ((TogglePatch)_Trainer.Patches[i].Patch).DisablePatch(_Trainer.Writer);
+                                //System.Media.SystemSounds.Question.Play();
+                                _Trainer.Patches[i].Enabled = false;
+                            }
                         }
                     }
                 }
-                Thread.Sleep(17);
+                catch
+                { }
+                Thread.Sleep(100);
             }
             //disable all patches
             for (var i = 0; i < _Trainer.Patches.Count; i++)
@@ -179,6 +207,78 @@ namespace Mandrasoft.TrainerLib
                     ((TogglePatch)_Trainer.Patches[i].Patch).DisablePatch(_Trainer.Writer);
                 }
             }
+        }
+
+        private static IntPtr SetHook(LowLevelKeyboardProc proc)
+        {
+            using (Process curProcess = Process.GetCurrentProcess())
+            using (ProcessModule curModule = curProcess.MainModule)
+            {
+                return SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
+            }
+        }
+        private static bool ApplicationIsActivated()
+        {
+            var activatedHandle = GetForegroundWindow();
+            if (activatedHandle == IntPtr.Zero)
+            {
+                return false;       // No window is currently activated
+            }
+            var procId = _Trainer.Writer.Process.Id;
+            int activeProcId;
+            GetWindowThreadProcessId(activatedHandle, out activeProcId);
+            return activeProcId == procId || activeProcId == Process.GetCurrentProcess().Id;
+        }
+        private static IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN && _Trainer.GameFound && ApplicationIsActivated() && stateAddr!=IntPtr.Zero)
+            {
+                int vkCode = Marshal.ReadInt32(lParam);
+                //find patch
+                var patch = _Trainer.Patches.SingleOrDefault(x => x.Key == (Keys)vkCode);
+                if (patch != null)
+                {
+                    if (patch.Toggleable && patch.Enabled)
+                    {
+                        if (_Trainer.Trainer.DisableSound != null)
+                        {
+                            PlaySound(_Trainer.Trainer.DisableSound);
+                        }
+                        else
+                            SystemSounds.Asterisk.Play();
+                            patch.Enabled = false;
+                            _Trainer.Writer.Write(stateAddr + 1 + _Trainer.Patches.IndexOf(patch), new byte[] { 0x0 });
+                        
+                    }
+                    else
+                    {
+                        if (_Trainer.Trainer.EnableSound != null)
+                        {
+                            PlaySound(_Trainer.Trainer.EnableSound);
+                        }
+                        else
+                            SystemSounds.Exclamation.Play();
+                        patch.Enabled = true;
+                            _Trainer.Writer.Write(stateAddr + 1 + _Trainer.Patches.IndexOf(patch), new byte[] { 0x1 });
+                        
+                    }
+                }
+            }
+            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+        static private SoundPlayer player = new SoundPlayer();
+        static void PlaySound(Stream sound)
+        {
+            using (var ns = new MemoryStream())
+            {
+                sound.CopyTo(ns);
+
+                ns.Position = 0;     // Manually rewind stream 
+                player.Stream = null;    // Then we have to set stream to null 
+                player.Stream = ns;  // And set it again, to force it to be loaded again... 
+                player.Load();
+                player.Play();
+            }          // Yes! We can play the sound! 
         }
     }
 }

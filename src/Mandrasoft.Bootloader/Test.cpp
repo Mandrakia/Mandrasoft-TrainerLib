@@ -3,9 +3,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "Test.h"
 using std::wstring;
 using std::vector;
-
 #pragma comment(lib, "mscoree.lib")
 
 #import "mscorlib.tlb" raw_interfaces_only \
@@ -61,13 +61,14 @@ ICLRRuntimeHost* GetRuntimeHost(LPCWSTR dotNetVersion)
 
 	return runtimeHost;
 }
+
 int ExecuteClrCode(ICLRRuntimeHost* host, LPCWSTR assemblyPath, LPCWSTR typeName,
 	LPCWSTR function, LPCWSTR param)
 {
 	if (NULL == host)
-		return -1;
-
+		return -1;	
 	DWORD result = -1;
+	LoadLibraryW(assemblyPath);
 	if (S_OK != host->ExecuteInDefaultAppDomain(assemblyPath, typeName, function, param, &result))
 		return -1;
 

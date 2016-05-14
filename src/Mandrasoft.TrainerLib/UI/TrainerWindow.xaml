@@ -15,23 +15,32 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="111*"/>
-            <RowDefinition Height="158*"/>
+            <RowDefinition Height="194*"/>
+            <RowDefinition Height="255*"/>
+            <RowDefinition Height="22*"/>
         </Grid.RowDefinitions>
         <Image x:Name="image" HorizontalAlignment="Left" VerticalAlignment="Top" Source="{Binding HeaderImage, Mode=OneWay}"/>
 
-        <ItemsControl ItemsSource="{Binding Patches}" Grid.Row="1">
+        <ItemsControl ItemsSource="{Binding Patches}" Grid.Row="1" Grid.RowSpan="1">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Vertical" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type Models:PatchModel}">                  
+                <DataTemplate DataType="{x:Type Models:PatchModel}">
                     <local:PatchControl IsEnabled="{Binding DataContext.GameFound, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:TrainerWindow}}}" ></local:PatchControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <StackPanel HorizontalAlignment="Center" Height="22" Grid.Row="2" VerticalAlignment="Top" Width="294">
+            <TextBlock HorizontalAlignment="Center">
+                Made with 
+            <Hyperlink NavigateUri="https://github.com/Mandrakia/Mandrasoft-TrainerLib" RequestNavigate="Hyperlink_RequestNavigate">
+                MandraSoft.TrainerLib
+            </Hyperlink>
+            </TextBlock>
+        </StackPanel>
 
     </Grid>
 </Window>

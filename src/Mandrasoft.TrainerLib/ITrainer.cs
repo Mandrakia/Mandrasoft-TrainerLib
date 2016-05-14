@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace Mandrasoft.TrainerLib
 {
     public interface ITrainer
     {
+        Stream EnableSound { get; }
+        Stream DisableSound { get; }
         string GameName { get; }
         string ExecutableName { get; }
         BitmapImage HeaderImage { get; }
