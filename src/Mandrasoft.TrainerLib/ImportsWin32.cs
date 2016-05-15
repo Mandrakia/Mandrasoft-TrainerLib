@@ -117,7 +117,8 @@ namespace Mandrasoft.TrainerLib
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
-
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize,uint flNewProtect, out uint lpflOldProtect);
         [DllImport("WinMM.dll")]
         public static extern bool PlaySound(string data, int Mod, int flag);     // these are the SoundFlags we are using here, check mmsystem.h for more    
         public const int SND_ASYNC = 0x0001;     // play asynchronously    

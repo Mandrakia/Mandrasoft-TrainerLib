@@ -14,6 +14,7 @@ namespace Mandrasoft.TrainerLib.UI.Models
         private bool _GameFound;
         public bool GameFound { get { return _GameFound; } set {  _GameFound = value; OnPropertyChanged(nameof(GameFound)); } }
         public BitmapImage HeaderImage { get; set; }
+        public BitmapImage Icon { get; set; }
         public string TitleWindow { get; set; }
         public List<PatchModel> Patches { get; set; }
         internal ITrainer Trainer { get; set; }
@@ -28,6 +29,7 @@ namespace Mandrasoft.TrainerLib.UI.Models
             try
             {
                 HeaderImage = trainer.HeaderImage;
+                Icon = trainer.Icon;
             }
             catch { }
             foreach (var p in trainer.Patches)

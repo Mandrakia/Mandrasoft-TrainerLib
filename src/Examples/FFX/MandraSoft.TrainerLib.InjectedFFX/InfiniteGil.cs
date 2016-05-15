@@ -23,7 +23,7 @@ namespace MandraSoft.TrainerLib.InjectedFFX
         {
             _writer = writer;
             _hook = ((IInjectedGameWriter)writer).HookFunction(addSpendGilFct, new SpendGil(SpendGilCustom));
-            _origFcn = Marshal.GetDelegateForFunctionPointer<SpendGil>(addSpendGilFct);
+            _origFcn = (SpendGil)Marshal.GetDelegateForFunctionPointer(addSpendGilFct,typeof(SpendGil));
             return true;
         }
         private int SpendGilCustom(int a1)

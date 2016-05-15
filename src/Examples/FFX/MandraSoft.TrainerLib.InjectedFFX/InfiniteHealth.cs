@@ -49,7 +49,7 @@ namespace MandraSoft.TrainerLib.InjectedFFX
             if (res.Success)
             {
                 addrFctDamageChara = res.Matches.First().Start;
-                originalCall = Marshal.GetDelegateForFunctionPointer<DamageCharacter>(addrFctDamageChara);
+                originalCall = (DamageCharacter)Marshal.GetDelegateForFunctionPointer(addrFctDamageChara,typeof(DamageCharacter));
             }
             res = writer.SearchMask(new MaskItem[] { 0x68, 0x70, 0xE2, 0x01, 0x00, 0xE8, "*", "*", "*", "*", 0xA3, "?", "?", "?", "?", 0x05, 0x40, 0x37, 0x01, 0x00, 0x68, 0xe0, 0xdc, 0x00, 0x00 });
             if (res.Success)

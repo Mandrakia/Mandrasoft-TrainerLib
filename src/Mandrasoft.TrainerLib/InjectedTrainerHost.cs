@@ -122,7 +122,7 @@ namespace Mandrasoft.TrainerLib
             WaitForSingleObject((IntPtr)lThreadId, 0xFFFFFFFF);
             process.Refresh();
             //ReserveSpace for StateStructure  
-            stateAddr = VirtualAllocEx(pHandle, IntPtr.Zero, (IntPtr)Marshal.SizeOf<TrainerStateStructure>(), AllocationType.Commit | AllocationType.Reserve, AllocationProtect.PAGE_EXECUTE_READWRITE);
+            stateAddr = VirtualAllocEx(pHandle, IntPtr.Zero, (IntPtr)Marshal.SizeOf(typeof(TrainerStateStructure)), AllocationType.Commit | AllocationType.Reserve, AllocationProtect.PAGE_EXECUTE_READWRITE);
         
             //Module loaded.
             //Now actually call the bootloader.

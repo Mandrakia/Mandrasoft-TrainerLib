@@ -8,7 +8,7 @@
         xmlns:Converters="clr-namespace:Mandrasoft.TrainerLib.UI.Converters"
              mc:Ignorable="d"
         Height="500" Width="300"
-             d:DesignHeight="767.073" d:DesignWidth="347.561" Title="{Binding TitleWindow}" ResizeMode="NoResize">
+             d:DesignHeight="767.073" d:DesignWidth="347.561" Title="{Binding TitleWindow}" ResizeMode="NoResize" Icon="{Binding Icon}">
 
     <Window.DataContext>
         <Models:TrainerModel/>

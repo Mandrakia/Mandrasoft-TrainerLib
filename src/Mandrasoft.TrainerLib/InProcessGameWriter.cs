@@ -13,6 +13,11 @@ namespace Mandrasoft.TrainerLib
     {
         public Process Process => Process.GetCurrentProcess();
         public IntPtr MainModulePtr => Process.GetCurrentProcess().MainModule.BaseAddress;
+
+        public InProcessGameWriter()
+        {
+            UnprotectMemory();
+        }
         public byte[] Read(IntPtr offset, int length)
         {
             byte* b = (byte*)offset;
@@ -96,7 +101,7 @@ namespace Mandrasoft.TrainerLib
                 switch (mask[i].Type)
                 {
                     case MaskItem.MaskType.Byte:
-                        if (mask[i].Byte != *(byte*)(start+i)) m = null;
+                        if (mask[i].Byte != *(byte*)(start + i)) m = null;
                         break;
                     case MaskItem.MaskType.Capture:
                         m.Captures.Add(*(byte*)(start + i));
@@ -109,18 +114,20 @@ namespace Mandrasoft.TrainerLib
 
         public int Write(IntPtr offset, byte[] bytes)
         {
-            byte* b = (byte*)offset;
-            foreach (byte by in bytes)
+            for (var i = 0; i < bytes.Length; i++)
             {
-                *b = by;
-                b++;
+                *(byte*)(offset + i) = bytes[i];
             }
             return bytes.Length;
         }
-
+        private void UnprotectMemory()
+        {
+            uint oldProt;
+            VirtualProtect(Process.GetCurrentProcess().MainModule.BaseAddress, (uint)Process.GetCurrentProcess().MainModule.ModuleMemorySize, 0x40, out oldProt);
+        }
         public LocalHook HookFunction(IntPtr fctAdress, Delegate deleg)
         {
-            var res =  LocalHook.Create(fctAdress, deleg, null);
+            var res = LocalHook.Create(fctAdress, deleg, null);
             res.ThreadACL.SetExclusiveACL(null);
             return res;
         }
