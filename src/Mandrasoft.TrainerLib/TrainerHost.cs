@@ -4,13 +4,14 @@ using System;
 
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
 using System.Runtime.InteropServices;
 
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-
+using System.Windows.Media;
 using static Mandrasoft.TrainerLib.ImportsWin32;
 
 namespace Mandrasoft.TrainerLib
@@ -94,6 +95,9 @@ namespace Mandrasoft.TrainerLib
                         var res = ((TogglePatch)patch.Patch).DisablePatch(_Trainer.Writer);
                         if (res)
                         {
+                            var player = new SoundPlayer(_Trainer.Trainer.EnableSound);
+                            player.Play();
+
                             Trace.WriteLine("Disabled");
                             patch.Enabled = false;
                         }
@@ -103,6 +107,9 @@ namespace Mandrasoft.TrainerLib
                         var res = patch.Patch.ApplyPatch(_Trainer.Writer);
                         if (res)
                         {
+                            var player = new SoundPlayer(_Trainer.Trainer.DisableSound);
+                            player.Play();
+
                             Trace.WriteLine("Enabled");
                             patch.Enabled = true;
                         }

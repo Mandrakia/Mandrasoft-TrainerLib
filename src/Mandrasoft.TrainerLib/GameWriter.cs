@@ -5,7 +5,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using WindowsInput;
+using WindowsInput.Native;
 using static Mandrasoft.TrainerLib.ImportsWin32;
 
 namespace Mandrasoft.TrainerLib
@@ -158,6 +162,92 @@ namespace Mandrasoft.TrainerLib
             if(success)
             return bytesWritten;
             else throw new Exception("Write error", new Win32Exception(Marshal.GetLastWin32Error()));
+        }
+
+        public void Click(int x, int y)
+        {
+            //INPUT mouseInput = new INPUT();
+            //mouseInput.type = SendInputEventType.InputMouse;
+            //mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
+            //mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
+            //mouseInput.mkhi.mi.mouseData = 0;
+
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            //Thread.Sleep(100);
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTUP;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
+            Thread.Sleep(10);
+            SendMessage(Process.MainWindowHandle, WM_LBUTTONDOWN, 0x00000000, CreateLParam(x, y));
+            Thread.Sleep(60);
+            SendMessage(Process.MainWindowHandle, WM_LBUTTONUP, 0x00000000, CreateLParam(x, y));
+        }
+
+        public void RightClick(int x, int y)
+        {
+
+            //INPUT mouseInput = new INPUT();
+            //mouseInput.type = SendInputEventType.InputMouse;
+            //mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
+            //mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
+            //mouseInput.mkhi.mi.mouseData = 0;
+
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            //Thread.Sleep(100);
+
+            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTUP;
+            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+
+            SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
+            Thread.Sleep(10);
+            SendMessage(Process.MainWindowHandle, WM_RBUTTONDOWN, 0x00000000, CreateLParam(x, y));
+            Thread.Sleep(60);
+            SendMessage(Process.MainWindowHandle, WM_RBUTTONUP, 0x00000000, CreateLParam(x, y));   
+        }
+
+        private uint TargetThreadId;
+        private int CurrentThreadId;
+
+        public void PressKey(Keys key)
+        {
+            new InputSimulator().Keyboard.KeyDown((VirtualKeyCode.LSHIFT));
+
+            //TargetThreadId = GetWindowThreadProcessId(Process.MainWindowHandle, IntPtr.Zero);
+            //CurrentThreadId =AppDomain.GetCurrentThreadId();
+            //AttachThreadInput(CurrentThreadId, (int)TargetThreadId, true);
+            //var kbState = new Byte[256];
+            //GetKeyboardState(kbState);
+            //kbState[(int)key] = 1;
+            //SetKeyboardState(kbState);
+
+            //PostMessage(Process.MainWindowHandle, WM_KEYDOWN, (IntPtr)key, IntPtr.Zero);
+        }
+        public void ReleaseKey(Keys key)
+        {
+
+            new InputSimulator().Keyboard.KeyUp((VirtualKeyCode.LSHIFT));
+
+            //var kbState = new Byte[256];
+            //GetKeyboardState(kbState);
+            //kbState[(int)key] = 0;
+            //SetKeyboardState(kbState);
+
+            //AttachThreadInput(CurrentThreadId, (int)TargetThreadId, false);
+            //PostMessage(Process.MainWindowHandle, WM_KEYUP, (IntPtr)key, IntPtr.Zero);
         }
     }
     public struct MaskItem
