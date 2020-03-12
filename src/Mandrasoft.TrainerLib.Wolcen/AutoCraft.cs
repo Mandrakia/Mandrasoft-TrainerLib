@@ -78,7 +78,7 @@ namespace Mandrasoft.TrainerLib.Wolcen
                         }
                         Inventory.RightClickOnInv(writer, x, y);
                         System.Threading.Thread.Sleep(Config.CraftDelay);
-                        Inventory.ClickOnInv(writer, 5, 8);
+                        Inventory.ClickOnInv(writer, 9, 5);
                         stackSize--;
                         System.Threading.Thread.Sleep(Config.CraftDelay);
 

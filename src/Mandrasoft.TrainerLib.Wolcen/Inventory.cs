@@ -49,8 +49,10 @@ namespace Mandrasoft.TrainerLib.Wolcen
         static internal void MoveStackElementFromInvToInv(IGameWriter writer, int iX, int iY, int tX, int tY)
         {
             writer.PressKey(System.Windows.Forms.Keys.LShiftKey);
+            Thread.Sleep(20);
             var inventoryPosition = GetPositionInventory(iX, iY);
             writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y);
+            Thread.Sleep(20);
             writer.ReleaseKey(System.Windows.Forms.Keys.LShiftKey);
             Thread.Sleep(MiniDelay);
             var tradePosition = GetPositionInventory(tX, tY);

@@ -184,7 +184,6 @@ namespace Mandrasoft.TrainerLib
             //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
             SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
-            Thread.Sleep(10);
             SendMessage(Process.MainWindowHandle, WM_LBUTTONDOWN, 0x00000000, CreateLParam(x, y));
             Thread.Sleep(60);
             SendMessage(Process.MainWindowHandle, WM_LBUTTONUP, 0x00000000, CreateLParam(x, y));
@@ -212,7 +211,6 @@ namespace Mandrasoft.TrainerLib
             //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
             SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
-            Thread.Sleep(10);
             SendMessage(Process.MainWindowHandle, WM_RBUTTONDOWN, 0x00000000, CreateLParam(x, y));
             Thread.Sleep(60);
             SendMessage(Process.MainWindowHandle, WM_RBUTTONUP, 0x00000000, CreateLParam(x, y));   

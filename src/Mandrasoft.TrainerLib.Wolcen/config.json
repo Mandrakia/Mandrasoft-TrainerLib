@@ -1,7 +1,7 @@
 {
   "MinDamage": 490,
   "MinResist": 500,
-  "AddressDamage": "0x4AC66FFC18",
+  "AddressDamage": "0x6E648FFA78",
   "AddressResist": "0x9298EE9D98",
   "DupeDelay": 350,
   "DupeMiniDelay": 250,
