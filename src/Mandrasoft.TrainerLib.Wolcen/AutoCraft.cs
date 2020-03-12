@@ -15,12 +15,13 @@ namespace Mandrasoft.TrainerLib.Wolcen
     class CraftConfig
     {
         public int MinDamage { get; set; }
-        public int MinDamageUbber { get; set; }
         public int MinResist { get; set; }
         public string AddressDamage { get; set; }
-        public string AddressAffix { get; set; }
         public string AddressResist { get; set; }
-        public int Delay { get; set; } = 350;
+        public int DupeDelay { get; set; } = 350;
+        public int DupeMiniDelay { get; internal set; } = 250;
+        public int CraftDelay { get; set; } = 120;
+        public int DupeLines { get; set; } = 6;
     }
     class AutoCraft : TogglePatch
     {
@@ -56,11 +57,7 @@ namespace Mandrasoft.TrainerLib.Wolcen
         {
             var Stats = JsonConvert.DeserializeObject<Dictionary<int, int>>(File.ReadAllText("stats.json"));
             Config = JsonConvert.DeserializeObject<CraftConfig>(File.ReadAllText("config.json"));
-            int sX = 1285;
-            int sY = 630;
             int stackSize = 20;
-            int deltaX = 65;
-            int deltaY = deltaX;
 
             for (var x = startX; x < 10; x++)
             {
@@ -79,11 +76,11 @@ namespace Mandrasoft.TrainerLib.Wolcen
                             SaveStats(Stats);
                             return;
                         }
-                        writer.RightClick(sX + x * deltaX, sY + y * deltaY);
-                        System.Threading.Thread.Sleep(100);
-                        writer.Click(1850, 880);
+                        Inventory.RightClickOnInv(writer, x, y);
+                        System.Threading.Thread.Sleep(Config.CraftDelay);
+                        Inventory.ClickOnInv(writer, 5, 8);
                         stackSize--;
-                        System.Threading.Thread.Sleep(120);
+                        System.Threading.Thread.Sleep(Config.CraftDelay);
 
                         var bytes = writer.Read(new IntPtr(Convert.ToInt64(Config.AddressDamage, 16)), 12);
                         var txt = GetNullString(bytes);

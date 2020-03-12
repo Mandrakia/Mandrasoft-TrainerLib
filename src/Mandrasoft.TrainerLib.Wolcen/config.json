@@ -1,8 +1,10 @@
 {
   "MinDamage": 490,
-  "MinDamageUbber": 490,
+  "MinResist": 500,
   "AddressDamage": "0x4AC66FFC18",
-  "AddressAffix": "0x4AC66FA5A3",
   "AddressResist": "0x9298EE9D98",
-  "MinResist": 500
+  "DupeDelay": 350,
+  "DupeMiniDelay": 250,
+  "CraftDelay": 120,
+  "DupeLines": 6
 }

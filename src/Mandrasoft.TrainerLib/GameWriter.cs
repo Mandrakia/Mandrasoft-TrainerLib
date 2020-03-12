@@ -87,7 +87,6 @@ namespace Mandrasoft.TrainerLib
         }
         public MaskMatchResult SearchMask(MaskItem[] mask)
         {
-            MEMORY_BASIC_INFORMATION reg = new MEMORY_BASIC_INFORMATION() { BaseAddress = pMainModule.BaseAddress, RegionSize = (IntPtr)pMainModule.ModuleMemorySize };
             return SearchMask(mask, pMainModule.BaseAddress, pMainModule.ModuleMemorySize);
         }
         public MaskMatchResult SearchMask(MaskItem[] mask, IntPtr start, int length)

@@ -18,6 +18,7 @@ namespace Mandrasoft.TrainerLib
 {
     public sealed class TrainerHost
     {
+        static private LowLevelKeyboardProc proc = new LowLevelKeyboardProc(KeyboardHookCallback);
         static private TrainerModel _Trainer;
         static private IntPtr _hookID;
         public static void Run<T>() where T : ITrainer
@@ -29,8 +30,9 @@ namespace Mandrasoft.TrainerLib
             var token = tokenSource.Token;
             Task t = Task.Run(()=>ProcessChecker(token),token);
             window.DataContext = _Trainer;
+
             if(!(_Trainer.Trainer is IInjectedTrainer))
-                _hookID = SetHook(KeyboardHookCallback);
+                _hookID = SetHook(proc);
             app.Run(window);
             tokenSource.Cancel();
             try

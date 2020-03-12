@@ -32,7 +32,7 @@ namespace Mandrasoft.TrainerLib.Wolcen
             }
         }
 
-        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.F1, new AutoCraft() }, { Keys.F2, new AutoArmorCraft() }, { Keys.F3, new Dupe() },{ Keys.F4, new Dupe2() } };
+        public Dictionary<Keys, Patch> Patches => new Dictionary<Keys, Patch> { { Keys.F1, new AutoCraft() }, { Keys.F2, new AutoArmorCraft() },{ Keys.F3, new Dupe() } };
 
         [STAThread]
         public static void Main(string[] args)
