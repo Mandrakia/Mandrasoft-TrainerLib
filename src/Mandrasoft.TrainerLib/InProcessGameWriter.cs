@@ -133,12 +133,12 @@ namespace Mandrasoft.TrainerLib
             return res;
         }
 
-        public void Click(int x, int y)
+        public void Click(int x, int y,bool isFocused = false)
         {
             throw new NotImplementedException();
         }
 
-        public void RightClick(int x, int y)
+        public void RightClick(int x, int y,bool isFocused = false)
         {
             throw new NotImplementedException();
         }

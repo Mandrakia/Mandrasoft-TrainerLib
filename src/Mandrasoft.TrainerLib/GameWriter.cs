@@ -163,59 +163,79 @@ namespace Mandrasoft.TrainerLib
             else throw new Exception("Write error", new Win32Exception(Marshal.GetLastWin32Error()));
         }
 
-        public void Click(int x, int y)
+        public void Click(int x, int y, bool isFocused = false)
         {
-            //INPUT mouseInput = new INPUT();
-            //mouseInput.type = SendInputEventType.InputMouse;
-            //mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
-            //mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
-            //mouseInput.mkhi.mi.mouseData = 0;
+            if (!isFocused)
+            {
+
+                SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
+                Thread.Sleep(10);
+                SendMessage(Process.MainWindowHandle, WM_LBUTTONDOWN, 0x00000000, CreateLParam(x, y));
+                Thread.Sleep(80);
+                SendMessage(Process.MainWindowHandle, WM_LBUTTONUP, 0x00000000, CreateLParam(x, y));
+            }
+            else
+            {
+                INPUT mouseInput = new INPUT();
+                mouseInput.type = SendInputEventType.InputMouse;
+                mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
+                mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
+                mouseInput.mkhi.mi.mouseData = 0;
 
 
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
-            //Thread.Sleep(100);
+                Thread.Sleep(80);
 
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTUP;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
-
-            SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
-            SendMessage(Process.MainWindowHandle, WM_LBUTTONDOWN, 0x00000000, CreateLParam(x, y));
-            Thread.Sleep(60);
-            SendMessage(Process.MainWindowHandle, WM_LBUTTONUP, 0x00000000, CreateLParam(x, y));
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_LEFTUP;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+            }
         }
 
-        public void RightClick(int x, int y)
+        public void RightClick(int x, int y, bool isFocused = false)
         {
+            if (!isFocused)
+            {
+                SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
+                Thread.Sleep(10);
+                SendMessage(Process.MainWindowHandle, WM_RBUTTONDOWN, 0x00000000, CreateLParam(x, y));
+                Thread.Sleep(80);
+                SendMessage(Process.MainWindowHandle, WM_RBUTTONUP, 0x00000000, CreateLParam(x, y));
+            }
+            else
+            {
+                INPUT mouseInput = new INPUT();
+                mouseInput.type = SendInputEventType.InputMouse;
+                mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
+                mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
+                mouseInput.mkhi.mi.mouseData = 0;
 
-            //INPUT mouseInput = new INPUT();
-            //mouseInput.type = SendInputEventType.InputMouse;
-            //mouseInput.mkhi.mi.dx = CalculateAbsoluteCoordinateX(x);
-            //mouseInput.mkhi.mi.dy = CalculateAbsoluteCoordinateY(y);
-            //mouseInput.mkhi.mi.mouseData = 0;
 
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_MOVE | MouseEventFlags.MOUSEEVENTF_ABSOLUTE;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
 
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+                Thread.Sleep(80);
 
-            //Thread.Sleep(100);
-
-            //mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTUP;
-            //SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
-
-            SendMessage(Process.MainWindowHandle, WM_MOUSEMOVE, 0, CreateLParam(x, y));
-            SendMessage(Process.MainWindowHandle, WM_RBUTTONDOWN, 0x00000000, CreateLParam(x, y));
-            Thread.Sleep(60);
-            SendMessage(Process.MainWindowHandle, WM_RBUTTONUP, 0x00000000, CreateLParam(x, y));   
+                mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTUP;
+                SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+            }
+        }
+        int CalculateAbsoluteCoordinateX(int x)
+        {
+            return (x * 65536) / GetSystemMetrics(SystemMetric.SM_CXSCREEN);
         }
 
+        int CalculateAbsoluteCoordinateY(int y)
+        {
+            return (y * 65536) / GetSystemMetrics(SystemMetric.SM_CYSCREEN);
+        }
         private uint TargetThreadId;
         private int CurrentThreadId;
 

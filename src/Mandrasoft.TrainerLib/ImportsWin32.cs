@@ -91,6 +91,14 @@ namespace Mandrasoft.TrainerLib
             WriteWatch = 0x200000,
             LargePages = 0x20000000
         }
+        internal enum SystemMetric
+        {
+            SM_CXSCREEN = 0,
+            SM_CYSCREEN = 1,
+        }
+
+        [DllImport("user32.dll")]
+        internal static extern int GetSystemMetrics(SystemMetric smIndex);
         [DllImport("user32.dll")]
         internal static extern bool SetKeyboardState(byte[] lpKeyState);
         [DllImport("user32.dll")]

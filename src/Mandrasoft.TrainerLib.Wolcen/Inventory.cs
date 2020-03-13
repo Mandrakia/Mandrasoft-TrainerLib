@@ -12,13 +12,13 @@ namespace Mandrasoft.TrainerLib.Wolcen
     {
         static public int Delay = 300;
         static public int MiniDelay = 300;
-        static internal void MoveFromTradeToInv(IGameWriter writer, int tX, int tY, int iX, int iY)
+        static internal void MoveFromTradeToInv(IGameWriter writer, int tX, int tY, int iX, int iY, bool isFocused = false)
         {
             var tradePosition = GetPositionTrade(tX, tY);
-            writer.Click((int)tradePosition.X, (int)tradePosition.Y);
+            writer.Click((int)tradePosition.X, (int)tradePosition.Y,isFocused);
             Thread.Sleep(Delay);
             var inventoryPosition = GetPositionInventory(iX, iY);
-            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y);
+            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y,isFocused);
         }
         static internal void MoveFromTradeToTrade(IGameWriter writer, int tX, int tY, int iX, int iY)
         {
@@ -28,13 +28,13 @@ namespace Mandrasoft.TrainerLib.Wolcen
             tradePosition = GetPositionTrade(iX, iY);
             writer.Click((int)tradePosition.X, (int)tradePosition.Y);
         }
-        static internal void MoveFromInvToTrade(IGameWriter writer, int iX, int iY, int tX, int tY)
+        static internal void MoveFromInvToTrade(IGameWriter writer, int iX, int iY, int tX, int tY, bool isFocused = false)
         {
             var inventoryPosition = GetPositionInventory(iX, iY);
-            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y);
+            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y,isFocused);
             Thread.Sleep(MiniDelay);
             var tradePosition = GetPositionTrade(tX, tY);
-            writer.Click((int)tradePosition.X, (int)tradePosition.Y);
+            writer.Click((int)tradePosition.X, (int)tradePosition.Y,isFocused);
         }
         static internal void MoveStackElementFromInvToTrade(IGameWriter writer, int iX, int iY, int tX, int tY)
         {
@@ -46,17 +46,17 @@ namespace Mandrasoft.TrainerLib.Wolcen
             var tradePosition = GetPositionTrade(tX, tY);
             writer.Click((int)tradePosition.X, (int)tradePosition.Y);
         }
-        static internal void MoveStackElementFromInvToInv(IGameWriter writer, int iX, int iY, int tX, int tY)
+        static internal void MoveStackElementFromInvToInv(IGameWriter writer, int iX, int iY, int tX, int tY, bool isFocused  = false)
         {
             writer.PressKey(System.Windows.Forms.Keys.LShiftKey);
-            Thread.Sleep(20);
+            Thread.Sleep(40);
             var inventoryPosition = GetPositionInventory(iX, iY);
-            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y);
-            Thread.Sleep(20);
+            writer.Click((int)inventoryPosition.X, (int)inventoryPosition.Y,isFocused);
+            Thread.Sleep(40 );
             writer.ReleaseKey(System.Windows.Forms.Keys.LShiftKey);
             Thread.Sleep(MiniDelay);
             var tradePosition = GetPositionInventory(tX, tY);
-            writer.Click((int)tradePosition.X, (int)tradePosition.Y);
+            writer.Click((int)tradePosition.X, (int)tradePosition.Y,isFocused);
         }
         static internal void RightClickOnInv(IGameWriter writer, int iX, int iY)
         {

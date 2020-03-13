@@ -45,11 +45,11 @@ namespace Mandrasoft.TrainerLib.Wolcen
                 for(var x = 0;x<10;x++)
                 {
                     if (token.IsCancellationRequested) return;
-                    Inventory.MoveFromInvToTrade(writer, 0, y, x, y);
+                    Inventory.MoveFromInvToTrade(writer, 0, y, x, y,true);
                     Thread.Sleep(Config.DupeDelay);                    
-                    Inventory.MoveStackElementFromInvToInv(writer, 1, y, 0, y);
+                    Inventory.MoveStackElementFromInvToInv(writer, 1, y, 0, y,true);
                     Thread.Sleep(Config.DupeMiniDelay);
-                    Inventory.MoveFromTradeToInv(writer, x, y,0,y);
+                    Inventory.MoveFromTradeToInv(writer, x, y,0,y,true);
                     Thread.Sleep(Config.DupeDelay);
                 }       
             }

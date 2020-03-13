@@ -32,8 +32,8 @@ namespace Mandrasoft.TrainerLib
         bool ApplyPatch(MaskItem[] mask, byte[] bytes);
         bool ApplyPatch(MaskItem[] mask, byte[] bytes, bool greedy);
         bool ApplyPatch(MaskItem[] mask, byte[] bytes, MaskMatch mt);
-        void Click(int x, int y);
-        void RightClick(int x, int y);
+        void Click(int x, int y,bool isFocused=false);
+        void RightClick(int x, int y,bool isFocused=false);
         void PressKey(Keys key);
         void ReleaseKey(Keys key);
     }
